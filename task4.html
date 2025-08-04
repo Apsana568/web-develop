@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Basic To-Do App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      padding: 50px 20px;
+    }
+
+    .todo-container {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1e293b;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"], input[type="datetime-local"] {
+      padding: 10px;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #3b82f6;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    .task {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: #f8fafc;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border-left: 5px solid #3b82f6;
+    }
+
+    .task.completed {
+      background: #d1fae5;
+      text-decoration: line-through;
+      opacity: 0.7;
+      border-left: 5px solid #10b981;
+    }
+
+    .task span {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .task-buttons {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .task-buttons button {
+      background: #e2e8f0;
+      color: #1e293b;
+      font-size: 0.8rem;
+    }
+
+    .task-buttons button:hover {
+      background: #cbd5e1;
+    }
+
+    .due-date {
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="todo-container">
+    <h1>📝 To-Do List</h1>
+    <div class="input-group">
+      <input type="text" id="taskInput" placeholder="Enter your task..." />
+      <input type="datetime-local" id="dateInput" />
+      <button onclick="addTask()">Add Task</button>
+    </div>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const taskList = document.getElementById("taskList");
+
+    function addTask() {
+      const taskText = document.getElementById("taskInput").value.trim();
+      const taskDate = document.getElementById("dateInput").value;
+
+      if (!taskText) {
+        alert("Please enter a task.");
+        return;
+      }
+
+      const li = document.createElement("li");
+      li.className = "task";
+
+      const content = document.createElement("div");
+      const taskSpan = document.createElement("span");
+      taskSpan.innerText = taskText;
+      taskSpan.contentEditable = true;
+      taskSpan.style.outline = "none";
+
+      const due = document.createElement("small");
+      due.className = "due-date";
+      due.innerText = taskDate ? `Due: ${new Date(taskDate).toLocaleString()}` : "";
+
+      content.appendChild(taskSpan);
+      content.appendChild(due);
+
+      const btns = document.createElement("div");
+      btns.className = "task-buttons";
+
+      const completeBtn = document.createElement("button");
+      completeBtn.innerText = "✔";
+      completeBtn.title = "Mark as Completed";
+      completeBtn.onclick = () => {
+        li.classList.toggle("completed");
+      };
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.innerText = "🗑";
+      deleteBtn.title = "Delete Task";
+      deleteBtn.onclick = () => {
+        li.remove();
+      };
+
+      btns.appendChild(completeBtn);
+      btns.appendChild(deleteBtn);
+
+      li.appendChild(content);
+      li.appendChild(btns);
+      taskList.appendChild(li);
+
+      // Clear inputs
+      document.getElementById("taskInput").value = "";
+      document.getElementById("dateInput").value = "";
+    }
+  </script>
+</body>
+</html>

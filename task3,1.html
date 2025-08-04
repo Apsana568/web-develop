@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sunset To-Do Web App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4, #fbc2eb, #a18cd1);
+      background-size: 200% 200%;
+      animation: sunsetGlow 20s ease infinite;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    @keyframes sunsetGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      margin: 30px 0;
+      font-size: 2.8rem;
+      text-shadow: 0 0 15px #ff6f91;
+    }
+
+    .todo-container {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 25px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 0 15px #ffa69e;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input, button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input[type="text"], input[type="datetime-local"] {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    button {
+      background: linear-gradient(to right, #ff758c, #ff7eb3);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px #ff9a9e;
+    }
+
+    .tasks {
+      margin-top: 30px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .task {
+      background: rgba(255, 255, 255, 0.08);
+      margin-bottom: 15px;
+      padding: 15px;
+      border-left: 5px solid #ffa69e;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.3s;
+    }
+
+    .task.done {
+      background: rgba(255, 255, 255, 0.05);
+      text-decoration: line-through;
+      opacity: 0.7;
+    }
+
+    .task-content {
+      flex-grow: 1;
+      padding-right: 10px;
+    }
+
+    .task-date {
+      font-size: 0.85rem;
+      color: #f0e6ef;
+    }
+
+    .actions button {
+      margin-left: 8px;
+      background-color: transparent;
+      border: 1px solid #ffc3a0;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+
+    .actions button:hover {
+      background-color: #ffc3a0;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌇 Sunset To-Do List</h1>
+
+  <div class="todo-container">
+    <div class="form-group">
+      <input type="text" id="taskInput" placeholder="Enter task..." />
+      <input type="datetime-local" id="dateInput" />
+      <button onclick="addTask()">Add Task</button>
+    </div>
+    <ul class="tasks" id="taskList"></ul>
+  </div>
+
+  <script>
+    let tasks = [];
+
+    function addTask() {
+      const taskText = document.getElementById('taskInput').value.trim();
+      const taskDate = document.getElementById('dateInput').value;
+
+      if (!taskText || !taskDate) return alert("Please enter task and date!");
+
+      const task = {
+        id: Date.now(),
+        text: taskText,
+        date: taskDate,
+        completed: false
+      };
+
+      tasks.push(task);
+      renderTasks();
+      document.getElementById('taskInput').value = '';
+      document.getElementById('dateInput').value = '';
+    }
+
+    function renderTasks() {
+      const taskList = document.getElementById('taskList');
+      taskList.innerHTML = '';
+
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = 'task' + (task.completed ? ' done' : '');
+
+        const content = document.createElement('div');
+        content.className = 'task-content';
+        content.innerHTML = `<strong>${task.text}</strong><br><span class="task-date">${new Date(task.date).toLocaleString()}</span>`;
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.textContent = task.completed ? 'Undo' : 'Done';
+        toggleBtn.onclick = () => toggleComplete(task.id);
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = () => editTask(task.id);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteTask(task.id);
+
+        actions.appendChild(toggleBtn);
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        li.appendChild(content);
+        li.appendChild(actions);
+        taskList.appendChild(li);
+      });
+    }
+
+    function toggleComplete(id) {
+      tasks = tasks.map(task =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      );
+      renderTasks();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(task => task.id !== id);
+      renderTasks();
+    }
+
+    function editTask(id) {
+      const task = tasks.find(t => t.id === id);
+      const newText = prompt("Edit task:", task.text);
+      if (newText !== null && newText.trim() !== '') {
+        task.text = newText.trim();
+        renderTasks();
+      }
+    }
+  </script>
+
+</body>
+</html>
